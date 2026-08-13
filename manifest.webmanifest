@@ -1,0 +1,9 @@
+{
+  "name":"Blaze Beat Lab",
+  "short_name":"Blaze Beats",
+  "start_url":"./",
+  "display":"standalone",
+  "background_color":"#0b0810",
+  "theme_color":"#100c16",
+  "description":"Touch-first West Coast drum machine and beat-production trainer."
+}

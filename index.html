@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#100c16" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Blaze Beat Lab</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="boot" class="boot">
+    <div class="boot-card">
+      <div class="brand-mark">BB</div>
+      <h1>Blaze Beat Lab</h1>
+      <p>West Coast beat machine + trainer</p>
+      <button id="startAudio" class="primary huge">START AUDIO</button>
+      <small>Tap once to unlock low-latency audio on iPhone/iPad.</small>
+    </div>
+  </div>
+
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">BLAZE BEAT LAB</div>
+        <h1>West Coast Lab</h1>
+      </div>
+      <button id="helpBtn" class="icon-btn" aria-label="Help">?</button>
+    </header>
+
+    <section class="mode-tabs" aria-label="Mode selector">
+      <button data-mode="live" class="mode active">LIVE</button>
+      <button data-mode="sequence" class="mode">SEQUENCE</button>
+      <button data-mode="learn" class="mode">LEARN</button>
+    </section>
+
+    <section class="transport card">
+      <div class="transport-row">
+        <button id="playBtn" class="transport-btn">▶</button>
+        <button id="stopBtn" class="transport-btn">■</button>
+        <button id="recordBtn" class="transport-btn record">●</button>
+        <button id="tapBtn" class="tap-btn">TAP</button>
+        <label class="bpm-wrap">BPM <input id="bpm" type="number" min="50" max="200" value="94" inputmode="numeric" /></label>
+      </div>
+      <div class="transport-row secondary">
+        <label>Swing <input id="swing" type="range" min="0" max="60" value="18" /></label>
+        <label>Bars
+          <select id="bars"><option>1</option><option selected>2</option><option>4</option><option>8</option></select>
+        </label>
+        <label>Master <input id="masterVol" type="range" min="0" max="100" value="85" /></label>
+      </div>
+      <div class="file-row">
+        <label class="file-btn">LOAD INSTRUMENTAL<input id="trackInput" type="file" accept="audio/*,.mp3,.wav,.m4a" hidden /></label>
+        <span id="trackName">No instrumental loaded</span>
+      </div>
+      <div class="track-controls">
+        <button id="trackPlayBtn" disabled>▶ Track</button>
+        <button id="trackStopBtn" disabled>■ Track</button>
+        <label>Track <input id="trackVol" type="range" min="0" max="100" value="70" /></label>
+      </div>
+    </section>
+
+    <section id="learnPanel" class="learn-panel card hidden">
+      <div class="lesson-head">
+        <div><div class="eyebrow">LESSON 01</div><h2>Build the backbone</h2></div>
+        <button id="nextLesson" class="primary">NEXT</button>
+      </div>
+      <p id="lessonText">Put the snare on beats 2 and 4. The highlighted steps show you exactly where.</p>
+      <div id="lessonProgress" class="lesson-progress">Step 1 of 4</div>
+    </section>
+
+    <section class="sequencer card" id="sequencerSection">
+      <div class="section-head"><h2>16-Step Sequencer</h2><span id="positionReadout">1.1</span></div>
+      <div class="step-numbers" id="stepNumbers"></div>
+      <div id="seqGrid" class="seq-grid"></div>
+      <div class="seq-actions">
+        <button id="clearPattern">CLEAR</button>
+        <button id="demoPattern">LOAD WEST COAST STARTER</button>
+        <button id="saveProject">SAVE</button>
+      </div>
+    </section>
+
+    <section class="pads-wrap">
+      <div class="section-head"><h2>Drum Pads</h2><span>Bank A · Built-in synth kit</span></div>
+      <div id="pads" class="pads"></div>
+    </section>
+
+    <section class="mixer card">
+      <div class="section-head"><h2>Selected Pad</h2><span id="selectedPadName">Kick 1</span></div>
+      <div class="mixer-controls">
+        <label>Volume <input id="padVol" type="range" min="0" max="120" value="100" /></label>
+        <label>Pitch <input id="padPitch" type="range" min="-12" max="12" value="0" /></label>
+      </div>
+      <div class="import-row">
+        <label class="file-btn">IMPORT PAD SOUND<input id="sampleInput" type="file" accept="audio/*,.mp3,.wav,.m4a" hidden /></label>
+        <button id="resetPad">RESET PAD</button>
+      </div>
+    </section>
+
+    <section class="exports card">
+      <div class="section-head"><h2>Recording</h2><span id="recordStatus">Ready</span></div>
+      <audio id="recordingPlayback" controls class="hidden"></audio>
+      <a id="downloadRecording" class="download hidden" download="blaze-beat-lab.webm">SAVE RECORDING</a>
+    </section>
+  </main>
+
+  <dialog id="helpDialog">
+    <h2>Fast start</h2>
+    <p>Tap START AUDIO, load an instrumental if you want, set its BPM, then play the pads or program the sequencer. LEARN mode walks you into a basic West Coast groove.</p>
+    <button id="closeHelp" class="primary">GOT IT</button>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
