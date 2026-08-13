@@ -30,7 +30,7 @@
   function initAudio(){
     const AC = window.AudioContext || window.webkitAudioContext;
     if(!AC) throw new Error('Web Audio is not supported on this browser.');
-    ctx = new AC({latencyHint:'interactive'});
+    try { ctx = new AC({latencyHint:'interactive'}); } catch { ctx = new AC(); }
     master = ctx.createGain();
     master.gain.value = 0.85;
     mediaDest = ctx.createMediaStreamDestination();
@@ -45,7 +45,22 @@
 
   async function ensureAudio(){
     if(!audioReady) initAudio();
-    if(ctx.state === 'suspended') await ctx.resume();
+    if(ctx.state === 'suspended' || ctx.state === 'interrupted') {
+      try { await ctx.resume(); } catch {}
+    }
+    // iOS Safari sometimes needs an actual audio node started inside the user gesture
+    // before it fully unlocks the hardware output.
+    if(!ensureAudio._unlocked){
+      try {
+        const b = ctx.createBuffer(1, 1, ctx.sampleRate);
+        const src = ctx.createBufferSource();
+        src.buffer = b;
+        src.connect(ctx.destination);
+        src.start(0);
+        ensureAudio._unlocked = true;
+      } catch {}
+    }
+    return ctx.state;
   }
 
   function noiseBuffer(duration=.2){
@@ -241,7 +256,7 @@
   const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 
   function wireUI(){
-    $('#startAudio').addEventListener('click',async()=>{await ensureAudio();$('#boot').classList.add('hidden');});
+    $('#startAudio').addEventListener('pointerdown',async(e)=>{e.preventDefault();const state=await ensureAudio();if(state==='running'){triggerPad(0,ctx.currentTime+.01);$('#boot').classList.add('hidden');}else{$('#startAudio').textContent='TAP AGAIN TO ENABLE AUDIO';}});
     $('#playBtn').addEventListener('click',()=>isPlaying?stopSeq():startSeq());$('#stopBtn').addEventListener('click',()=>{stopSeq();stopTrack();});$('#recordBtn').addEventListener('click',toggleRecord);
     $('#tapBtn').addEventListener('pointerdown',()=>{const n=performance.now();tapTimes=tapTimes.filter(t=>n-t<2400);tapTimes.push(n);if(tapTimes.length>1){const dif=tapTimes.slice(1).map((t,i)=>t-tapTimes[i]);$('#bpm').value=clamp(Math.round(60000/(dif.reduce((a,b)=>a+b,0)/dif.length)),50,200);saveState();}});
     $$('.mode').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
@@ -255,5 +270,6 @@
     ['bpm','swing','bars'].forEach(id=>$(`#${id}`).addEventListener('change',saveState));
   }
 
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden && ctx && (ctx.state==='suspended' || ctx.state==='interrupted')) ctx.resume().catch(()=>{}); });
   restoreState();renderPads();renderGrid();wireUI();
 })();
